@@ -213,13 +213,45 @@ input[type=text]{background:var(--panel2);border:1px solid var(--line);border-ra
 .cname{font:800 clamp(22px,6vw,44px) var(--fd);letter-spacing:.12em;animation:spl .7s .35s cubic-bezier(.2,1.6,.4,1) both}.cname b{color:var(--accent)}
 @keyframes cbd{from{transform:translateY(-50%) skewY(-6deg) scaleX(0)}to{transform:translateY(-50%) skewY(-6deg) scaleX(1)}}
 @media (prefers-reduced-motion:reduce){.cband,.cname{animation:none}}
+.load::before{content:'';position:absolute;inset:-20%;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 60px,transparent 60px 140px);animation:lsl 6s linear infinite;pointer-events:none}
+@keyframes lsl{to{transform:translateX(140px)}}
+.load .lg{background:linear-gradient(100deg,#fff 40%,#ffe9a8 50%,#fff 60%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:lsh 2.4s linear infinite;position:relative}
+.load .lg span{-webkit-text-fill-color:var(--accent)}
+@keyframes lsh{from{background-position:150% 0}to{background-position:-100% 0}}
+.lpct{font:800 22px var(--fd);letter-spacing:.2em;color:var(--accent);position:relative}
+.ltip{font-size:13px;color:var(--muted);text-align:center;min-height:20px;padding:0 24px;position:relative}
+.lstart{position:relative;animation:lbp 1s ease-in-out infinite alternate;letter-spacing:.2em}
+@keyframes lbp{from{transform:scale(1)}to{transform:scale(1.07)}}
+.load .lb{position:relative}
+.intro{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;gap:2vw;background:linear-gradient(180deg,rgba(7,12,16,.6),rgba(7,12,16,.1) 55%,rgba(7,12,16,.6));overflow:hidden;cursor:pointer}
+.vsl,.vsr{flex:1;max-width:40%;padding:16px 26px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.vsl{background:linear-gradient(90deg,var(--c),rgba(0,0,0,.7));clip-path:polygon(0 0,100% 0,92% 100%,0 100%);animation:vsi .55s cubic-bezier(.2,1,.3,1) both}
+.vsr{background:linear-gradient(270deg,var(--c),rgba(0,0,0,.7));clip-path:polygon(8% 0,100% 0,100% 100%,0 100%);text-align:right;animation:vso .55s cubic-bezier(.2,1,.3,1) both}
+.vsl small,.vsr small{display:block;font:700 12px var(--fd);letter-spacing:.3em;opacity:.8}
+.vsl b,.vsr b{display:block;font:800 clamp(22px,5vw,52px)/1.1 var(--fd);letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vsl i,.vsr i{font:700 clamp(13px,2.4vw,20px) var(--fd);letter-spacing:.1em;font-style:normal;opacity:.9}
+.vsx{font:800 clamp(34px,8vw,90px)/1 var(--fd);color:var(--accent);text-shadow:0 0 24px rgba(255,176,32,.7);animation:spl .6s .45s cubic-bezier(.2,1.6,.4,1) both}
+.vsh{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted)}
+@keyframes vsi{from{transform:translateX(-120%)}to{transform:none}}
+@keyframes vso{from{transform:translateX(120%)}to{transform:none}}
+.goalfx{position:absolute;left:0;right:0;top:28%;z-index:5;pointer-events:none}
+.gband{padding:8px 0 10px;text-align:center;background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),linear-gradient(90deg,transparent,var(--c) 14%,var(--c) 86%,transparent);transform:skewY(-4deg)}
+.goalfx.go .gband{animation:gin 2.3s ease-out both}
+.gt{font:800 clamp(48px,13vw,140px)/1 var(--fd);letter-spacing:.14em;color:#fff;text-shadow:0 5px 0 rgba(0,0,0,.35)}
+.gn{font:700 clamp(18px,4vw,34px) var(--fd);letter-spacing:.18em;color:#fff}
+@keyframes gin{0%{transform:skewY(-4deg) translateX(-110%)}12%{transform:skewY(-4deg) translateX(0)}86%{transform:skewY(-4deg) translateX(0);opacity:1}100%{transform:skewY(-4deg) translateX(110%);opacity:0}}
+.mhud .sb{background:rgba(10,18,26,.8);padding:3px 18px;clip-path:polygon(3% 0,97% 0,100% 100%,0 100%);border-bottom:3px solid var(--accent)}
+.clock{background:var(--accent);color:var(--accent-ink);padding:2px 10px;border-radius:2px}
+.rtt{font:800 clamp(34px,9vw,60px)/1 var(--fd);letter-spacing:.14em;text-align:center;animation:spl .7s both}
+.rtt.W{color:var(--accent)}.rtt.D{color:#cbd5e1}.rtt.L{color:var(--bad)}
+@media (prefers-reduced-motion:reduce){.load::before,.load .lg,.lstart,.vsl,.vsr,.vsx,.goalfx.go .gband{animation:none}}
 </style>
 <div class="wrap">
   <header class="top"><div class="brand">d<span>Footbal</span></div><div id="stat" class="stat"></div></header>
   <nav id="nav" class="nav" aria-label="メニュー"></nav>
   <main id="main"></main>
 </div>
-<div id="load" class="load"><div class="lg">d<span>Footbal</span></div><div class="lb"><i id="loadbar"></i></div><div class="nt">本作は架空のクラブ・選手によるオリジナルのサッカーゲームです。実在の団体・選手・既存のゲーム作品とは関係ありません。</div></div>
+<div id="load" class="load"><div class="lg">d<span>Footbal</span></div><div class="lb"><i id="loadbar"></i></div><div class="lpct" id="lpct">0%</div><div class="ltip" id="ltip"></div><button class="btn pri lstart" id="lstart" hidden>TAP TO START</button><div class="nt">本作は架空のクラブ・選手によるオリジナルのサッカーゲームです。実在の団体・選手・既存のゲーム作品とは関係ありません。</div></div>
 <div id="toast" hidden></div>
 <div id="gx" class="gx" hidden><div class="rays"><i></i></div><canvas id="gfx"></canvas><div id="gfl" class="flash"></div><div id="gbody" class="gbody"></div></div>
 <div id="ml" class="ml" hidden>
@@ -234,7 +266,7 @@ input[type=text]{background:var(--panel2);border:1px solid var(--line);border-ra
     <div id="zone" class="zone"></div>
     <div id="stick" class="stick"><i id="knob"></i></div>
     <div class="btns"><button class="cb big" data-k="sprint">DASH</button><button class="cb pa" data-k="pass">PASS</button><button class="cb da" data-k="shoot">SHOOT</button><button class="cb sw" data-k="sw">CHANGE</button><button class="cb fe" data-k="feint">FEINT</button></div>
-    <div id="banner" class="banner" hidden></div><div id="pov" class="pov" hidden></div>
+    <div id="banner" class="banner" hidden></div><div id="pov" class="pov" hidden></div><div id="intro" class="intro" hidden></div><div id="goalfx" class="goalfx" hidden></div>
   </div>
   <div class="hint">移動: 矢印 / WASD　シュート: Space(長押しで強く)　パス: J(緑の輪の味方へ届く)　ダッシュ: K　フェイント: F　選手交代: L　一時停止: Esc</div>
 </div>
@@ -506,7 +538,7 @@ function startMatch(ut,ot,onEnd,diff){
   $('#pov').hidden=true;$('#ml').hidden=false;
   gfxStart(M);
   document.documentElement.style.overflow='hidden';
-  resetKick(0);
+  resetKick(0);M.phase='intro';M.pt=2.8;M.ik=1;banner(null);showIntro(ut,ot);
   lastTs=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
 }
 function stopMatch(){
@@ -656,6 +688,7 @@ function update(dt){
   {const f0=b.owner,tx0=f0?f0.x+f0.fx*140:b.x+b.vx*.3,ty0=f0?f0.y+f0.fy*50:b.y+b.vy*.2,ck=Math.min(1,dt*(m.phase==='play'?3.5:6));
    m.cam.x+=(clamp(tx0,500,W-500)-m.cam.x)*ck;m.cam.y+=(clamp(ty0,330,H-330)-m.cam.y)*ck}
   if(m.phase==='end')return;
+  if(m.phase==='intro'){m.pt-=dt;m.ik=Math.max(0,m.pt/2.8);m.ik*=m.ik;if(m.pt<=0||m.skip){m.ik=0;m.skip=false;m.phase='kick';m.pt=1.3;$('#intro').hidden=true;banner('KICK OFF');sfx('whistle')}return}
   if(m.phase==='kick'){m.pt-=dt;if(m.pt<=0){m.phase='play';banner(null)}return}
   if(m.phase==='sp'){m.sp.pt-=dt;if(m.sp.pt<=0)startSp();return}
   if(m.phase==='half'||m.phase==='goal'){
@@ -870,6 +903,18 @@ function hud(){
   const el=$('#who');if(!el)return;
   el.innerHTML=c?'<span>#'+c.num+' '+esc(c.name)+'</span><i style="width:'+Math.round(c.sta*44)+'px"></i>':'';
 }
+function showIntro(ut,ot){
+  const av=q=>Math.round(q.players.reduce((a,p)=>a+ovr(p),0)/q.players.length);
+  const el=$('#intro');
+  el.innerHTML='<div class="vsl" style="--c:'+esc(ut.color)+'"><small>HOME</small><b>'+esc(ut.name)+'</b><i>OVR '+av(ut)+' ・ '+ut.form+'</i></div><div class="vsx">VS</div><div class="vsr" style="--c:'+esc(ot.color)+'"><small>AWAY</small><b>'+esc(ot.name)+'</b><i>OVR '+av(ot)+' ・ '+ot.form+'</i></div><div class="vsh">タップでスキップ</div>';
+  el.hidden=false;sfx('crowd');
+}
+function goalCut(nm,t){
+  const e=$('#goalfx');e.style.setProperty('--c',M.cols[t]);
+  e.innerHTML='<div class="gband"><div class="gt">GOAL</div><div class="gn">'+esc(nm)+'</div></div>';
+  e.hidden=false;e.classList.remove('go');void e.offsetWidth;e.classList.add('go');sfx('cheer');
+  setTimeout(()=>{e.hidden=true},2300);
+}
 function scored(t){
   const m=M,s=m.ball.last;
   m.score[t]++;m.flash=.6;sfx('goal');
@@ -877,7 +922,7 @@ function scored(t){
   m.events.push({min:m.min,t,name:nm});
   $('#sbS').textContent=m.score[0]+' - '+m.score[1];
   m.phase='goal';m.pt=2.4;m.kickNext=1-t;m.ball.owner=null;
-  banner('GOAL!  '+nm);
+  banner(null);goalCut(nm,t);
 }
 function finish(){
   const m=M;m.phase='end';banner(null);sfx('whistle');
@@ -1235,7 +1280,7 @@ function draw3d(){
   if(m.shake){g3.shake=Math.max(g3.shake,.7);m.shake=0}
   g3.shake=Math.max(0,g3.shake-dt*2.2);
   const sk=g3.shake*(Math.random()-.5)*6;
-  g3.cam.position.set(cx0+sk,520,cz0+760+sk*.5);
+  const ik=m.ik||0;g3.cam.position.set(cx0+sk+ik*500,520+ik*900,cz0+760+ik*700+sk*.5);
   g3.cam.lookAt(cx0,0,cz0+10);
   g3.sun.position.set(cx0-260,700,cz0+400);g3.sun.target.position.set(cx0,0,cz0);g3.sun.target.updateMatrixWorld();
   g3.r.render(g3.sc,g3.cam);
@@ -1420,7 +1465,7 @@ function showResult(res,coins,extra){
   const win=res.gf>res.ga,draw=res.gf===res.ga;
   const ev=res.events.map(e=>'<div class="hist" style="padding:4px 0"><span class="muted" style="width:34px">'+e.min+"'</span><span style=\"flex:1;color:"+(e.t?'var(--foe)':'var(--me)')+'">'+esc(e.name)+(e.card?(e.card==='yellow'?' [警告]':' [退場]'):'')+'</span></div>').join('')||'<p class="muted">ゴールなし</p>';
   const pv=$('#pov');
-  pv.innerHTML='<div class="panel"><h3 style="text-align:center">'+(win?'勝利':draw?'引き分け':'敗戦')+'</h3><div class="big" style="text-align:center">'+res.gf+' - '+res.ga+'</div><div class="muted" style="text-align:center;margin-bottom:10px">'+esc(res.names[0])+' vs '+esc(res.names[1])+'</div>'
+  pv.innerHTML='<div class="panel"><div class="rtt '+(win?'W':draw?'D':'L')+'">'+(win?'VICTORY':draw?'DRAW':'DEFEAT')+'</div><div class="big" style="text-align:center">'+res.gf+' - '+res.ga+'</div><div class="muted" style="text-align:center;margin-bottom:10px">'+esc(res.names[0])+' vs '+esc(res.names[1])+'</div>'
    +'<div class="hist" style="justify-content:space-between"><span>シュート</span><b>'+res.shots[0]+' - '+res.shots[1]+'</b></div><div class="hist" style="justify-content:space-between"><span>ボール支配率</span><b>'+res.poss[0]+'% - '+res.poss[1]+'%</b></div>'+(res.fouls?'<div class="hist" style="justify-content:space-between"><span>ファウル / カード</span><b>'+res.fouls[0]+' / '+res.cards[0]+' - '+res.fouls[1]+' / '+res.cards[1]+'</b></div>':'')
    +'<h3 style="margin-top:12px">得点経過</h3>'+ev+'<p class="coin" style="margin:12px 0">+'+coins+' コイン</p>'+extra+'<button class="btn pri" data-act="done">続ける</button></div>';
   pv.hidden=false;
@@ -1807,9 +1852,14 @@ function gachaReveal(best,skip){
 }
 function gachaClose(){$('#gx').hidden=true;clearTimers();if(gx.scene){gx.scene.stop=true;cancelAnimationFrame(gx.scene.raf);gx.scene=null}cancelAnimationFrame(gx.raf);gx.raf=0;gx.parts=[];gx.res=null;render()}
 (function boot(){
-  const L=$('#load'),bar=$('#loadbar');let t=0;
-  const iv=setInterval(()=>{t+=.04;bar.style.width=Math.min(100,t*100/1.8)+'%';
-    if(t>=1.8&&(typeof THREE!=='undefined'||t>4.5)){clearInterval(iv);L.classList.add('out');setTimeout(()=>{L.hidden=true},550)}},40);
+  const L=$('#load'),bar=$('#loadbar'),pc=$('#lpct'),tp=$('#ltip'),bt=$('#lstart');
+  const TIPS=['パスは緑の輪の味方に届きます','シュートは長押しでパワーをため、照準線を見て狙おう','FEINTで相手を置き去りにしよう','DASHは体力を使います。使いどころが大事','ガチャは40連でURが確定します','デイリーミッションを毎日こなそう'];
+  let t=0,ti=0;tp.textContent='TIPS　'+TIPS[0];
+  const tv=setInterval(()=>{ti=(ti+1)%TIPS.length;tp.textContent='TIPS　'+TIPS[ti]},1800);
+  const iv=setInterval(()=>{t+=.04;const v=Math.min(100,t*100/2.6);bar.style.width=v+'%';pc.textContent=Math.floor(v)+'%';
+    if(t>=2.6&&(typeof THREE!=='undefined'||t>5)){clearInterval(iv);clearInterval(tv);pc.textContent='READY';bt.hidden=false}},40);
+  bt.addEventListener('click',()=>{audioUnlock();sfx('whistle');L.classList.add('out');setTimeout(()=>{L.hidden=true},550)});
+  $('#intro').addEventListener('click',()=>{if(M)M.skip=true});
 })();
 S=load();
 render();
