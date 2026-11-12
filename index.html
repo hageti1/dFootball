@@ -547,12 +547,20 @@ function resetKick(kt){
   const m=M;
   for(const p of m.players){
     const h=homePos(p);
-    p.x=p.t?Math.max(h.x,W/2+30):Math.min(h.x,W/2-30);
-    if(p.gk)p.x=h.x;
+    /* 隊形を自陣に収める(センターサークル半径275の外) */
+    p.x=p.gk?h.x:(p.t?W-(W-h.x)*.62:h.x*.62);
     p.y=h.y;p.vx=p.vy=0;p.fx=dirOf(p.t);p.fy=0;p.cool=0;p.hold=0;
   }
   const k=m.players.filter(p=>p.t===kt&&!p.gk).sort((a,b)=>b.slot.x-a.slot.x)[0];
   k.x=W/2-dirOf(kt)*14;k.y=H/2;
+  /* 近すぎる選手同士を離す(最低 150) */
+  for(let it=0;it<12;it++)for(let i=0;i<m.players.length;i++)for(let j=i+1;j<m.players.length;j++){
+    const a=m.players[i],b=m.players[j];if(a===k||b===k||a.gk||b.gk)continue;
+    let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1;
+    if(d<150){const f=(150-d)/2;dx/=d;dy/=d;a.x-=dx*f;a.y-=dy*f;b.x+=dx*f;b.y+=dy*f}
+  }
+  for(const p of m.players){if(p===k||p.gk)continue;p.y=clamp(p.y,60,H-60);
+    p.x=p.t?Math.max(p.x,W/2+300):Math.min(p.x,W/2-300)}
   const b=m.ball;b.x=W/2;b.y=H/2;b.vx=b.vy=0;b.owner=k;b.last=k;
   if(kt===0)m.ctrl=k;else m.ctrl1=k;m.rec=[];m.rep=null;m.celeb=null;
   m.phase='kick';m.pt=1.3;banner('KICK OFF');sfx('whistle');
