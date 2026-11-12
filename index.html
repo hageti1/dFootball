@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0d1419">
 <style>:root{color-scheme:dark;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>dFootbal</title>
+<title>dFootball</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
 <style>
 /* Layout: sticky club bar, tab nav, one working screen at a time; a match opens a full-screen floodlit stage. Single committed night-match look. */
@@ -264,13 +264,17 @@ input[type=text]{background:var(--panel2);border:1px solid var(--line);border-ra
 .cb.dsh{right:0;bottom:150px;width:60px;height:60px;font-size:11px}
 .cb.fnt{right:150px;bottom:150px;width:54px;height:54px;font-size:10px}
 .cb.chg{left:18px;bottom:150px;width:54px;height:54px;font-size:10px}
+.pk{position:fixed;inset:0;z-index:50;background:#050d16;display:flex;align-items:center;justify-content:center;touch-action:none}
+.pk canvas{width:min(100vw,calc(100vh*16/9));height:auto;aspect-ratio:16/9;display:block;touch-action:none}
+.cb.pkb{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:max(18px,env(safe-area-inset-bottom,0px));width:96px;height:96px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-size:15px;z-index:51}
+.cb.pkb small{font-size:9px;font-weight:600}
 </style>
 <div class="wrap">
-  <header class="top"><div class="brand">d<span>Footbal</span></div><div id="stat" class="stat"></div></header>
+  <header class="top"><div class="brand">d<span>Football</span></div><div id="stat" class="stat"></div></header>
   <nav id="nav" class="nav" aria-label="メニュー"></nav>
   <main id="main"></main>
 </div>
-<div id="load" class="load"><div class="lg">d<span>Footbal</span></div><div class="lb"><i id="loadbar"></i></div><div class="lpct" id="lpct">0%</div><div class="ltip" id="ltip"></div><button class="btn pri lstart" id="lstart" hidden>TAP TO START</button><div class="nt">本作は架空のクラブ・選手によるオリジナルのサッカーゲームです。実在の団体・選手・既存のゲーム作品とは関係ありません。</div></div>
+<div id="load" class="load"><div class="lg">d<span>Football</span></div><div class="lb"><i id="loadbar"></i></div><div class="lpct" id="lpct">0%</div><div class="ltip" id="ltip"></div><button class="btn pri lstart" id="lstart" hidden>TAP TO START</button><div class="nt">本作はeFootballをまねて作った、コラージュ風の非公式ファンゲームです。クラブ・選手はすべて架空で、KONAMI・eFootballとは一切関係ありません(公式ではありません)。</div></div>
 <div id="toast" hidden></div>
 <div id="gx" class="gx" hidden><div class="rays"><i></i></div><canvas id="gfx"></canvas><div id="gfl" class="flash"></div><div id="gbody" class="gbody"></div></div>
 <div id="ml" class="ml" hidden>
@@ -284,11 +288,12 @@ input[type=text]{background:var(--panel2);border:1px solid var(--line);border-ra
     <canvas id="cv" width="1680" height="1080"></canvas>
     <div id="zone" class="zone"></div>
     <div id="stick" class="stick"><i id="knob"></i></div>
-    <div class="btns"><button class="cb ba" data-k="a">パス</button><button class="cb bb" data-k="b">シュート</button><button class="cb bc" data-k="c">スルー</button><button class="cb bd" data-k="d">ロブ</button><button class="cb dsh" data-k="sprint">DASH</button><button class="cb fnt" data-k="feint">FEINT</button></div><button class="cb chg" data-k="sw">CHANGE</button>
+    <div class="btns"><button class="cb ba" data-k="a">パス</button><button class="cb bb" data-k="b">シュート</button><button class="cb bc" data-k="c">スルー</button><button class="cb bd" data-k="d">ロブ</button><button class="cb dsh" data-k="sprint">DASH</button></div>
     <div id="banner" class="banner" hidden></div><div id="pov" class="pov" hidden></div><div id="intro" class="intro" hidden></div><div id="goalfx" class="goalfx" hidden></div><div id="rpl" class="rpl" hidden>● REPLAY<small>タップでスキップ</small></div>
   </div>
   <div class="hint">移動: 矢印 / WASD　シュート: Space(長押しで強く)　パス: J(緑の輪の味方へ届く)　ダッシュ: K　ロブ: I　スルー: U　フェイント: F　プレス(長押し): H　タックル: N　スライド: M　選手交代: L　一時停止: Esc</div>
 </div>
+<div id="pk" class="pk" hidden><canvas id="pkc" width="960" height="540"></canvas><button class="cb pkb" id="pkb" hidden>SHOOT<br><small>長押し→離す</small></button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
@@ -1175,7 +1180,7 @@ function boardTexture(c1,c2){
   return cTex(512,48,(c,w,h)=>{
     c.fillStyle=c1;c.fillRect(0,0,w,h);c.fillStyle=c2;
     c.font='800 30px "Barlow Condensed",sans-serif';c.textBaseline='middle';
-    for(let x=10;x<w;x+=170)c.fillText('dFootbal',x,h/2+1);
+    for(let x=10;x<w;x+=170)c.fillText('dFootball',x,h/2+1);
   },[6,1]);
 }
 function netTexture(){
@@ -1393,7 +1398,7 @@ const ST5=[...ST,['gk','GK']];
 
 function render(){
   if(!S){renderWelcome();return}
-  const br=document.querySelector('.brand');if(br)br.innerHTML=S.title?esc(S.title):'d<span>Footbal</span>';
+  const br=document.querySelector('.brand');if(br)br.innerHTML=S.title?esc(S.title):'d<span>Football</span>';
   $('#stat').innerHTML='<b>'+esc(S.club)+'</b><span>第'+S.season+'シーズン</span><span>🎫'.replace('🎫','チケット ')+S.tickets+'</span><span class="coin">'+S.coins.toLocaleString()+' C</span>';
   $('#nav').innerHTML=TABS.map(([k,l])=>'<button data-act="tab" data-t="'+k+'" aria-current="'+(tab===k)+'">'+l+'</button>').join('');
   $('#main').innerHTML=({home:viewHome,team:viewTeam,gacha:viewGacha,league:viewLeague,online:viewOnline,record:viewRecord,set:viewSet})[tab]();
@@ -1420,7 +1425,7 @@ function viewHome(){
     h+='<div class="muted" style="margin-bottom:4px">第'+(S.week+1)+'節 / 全10節 ・ 現在 '+rk+' 位</div><div class="vs"><div class="tm"><span class="dot" style="background:'+esc(S.color)+'"></span>'+esc(S.club)+'</div><i>VS</i><div class="tm r"><span class="dot" style="background:'+tcol(f.opp)+'"></span>'+esc(tname(f.opp))+'</div></div>';
     h+='<div class="row" style="margin-bottom:14px">'+DIFF.map((d,i)=>'<button class="btn sm'+(S.diff===i?' on':'')+'" data-act="diff" data-d="'+i+'">'+d+'</button>').join('')+'</div><button class="btn pri" data-act="play">キックオフ</button>';
   }else h+='<p class="muted">今シーズンの試合は終了しました。</p><button class="btn pri" data-act="newseason">第'+(S.season+1)+'シーズンへ</button>';
-  h+='</section><section class="panel"><h3>オンライン対戦</h3><p style="margin:0 0 12px">友達が公開したチームと対戦して、ランキングを競います。</p><div class="row"><button class="btn pri" data-act="quick">⚡ ワンタップマッチ</button><button class="btn" data-act="pvpq">⚔ リアルタイム対戦</button><button class="btn" data-act="tab" data-t="online">対戦相手を探す</button></div><p class="muted" style="margin:10px 0 0;font-size:12px">'+(S.published?'あなたのチームは公開中です。':'まだチームを公開していません。')+'</p></section>';
+  h+='</section><section class="panel"><h3>オンライン対戦</h3><p style="margin:0 0 12px">友達が公開したチームと対戦して、ランキングを競います。</p><div class="row"><button class="btn pri" data-act="quick">⚡ ワンタップマッチ</button><button class="btn" data-act="pvpq">⚔ リアルタイム対戦</button><button class="btn" data-act="pk">PK戦</button><button class="btn" data-act="tab" data-t="online">対戦相手を探す</button></div><p class="muted" style="margin:10px 0 0;font-size:12px">'+(S.published?'あなたのチームは公開中です。':'まだチームを公開していません。')+'</p></section>';
   h+=cupHtml()+missionHtml();
   h+='<section class="panel"><h3>今日のおすすめ</h3><div class="row"><button class="btn'+(free?' on':'')+'" data-act="tab" data-t="gacha">'+(free?'無料ガチャが引けます':'ガチャ')+'</button><button class="btn" data-act="tab" data-t="team">チーム編成</button><button class="btn" data-act="tab" data-t="record">成績を見る</button></div></section>';
   h+='<section class="panel"><h3>直近の試合</h3>';
@@ -1459,8 +1464,9 @@ function startCup(){
   startMatch(ut,oppTeam(r.opp,S.cup.round),res=>finishCup(r,res),S.cup.round);
 }
 function finishCup(r,res){
+  if(res.gf===res.ga&&!res.pk){startPK(ownTeam(),oppTeam(r.opp,S.cup.round),w=>{res.pk=w?1:2;finishCup(r,res)});return}
   let win=res.gf>res.ga,extra='';
-  if(res.gf===res.ga){win=Math.random()<.5;extra='<p style="font-weight:700">引き分け。PK戦の結果、'+(win?'勝ち抜きました':'敗退しました')+'。</p>'}
+  if(res.gf===res.ga){win=res.pk===1;extra='<p style="font-weight:700">引き分け。PK戦の結果、'+(win?'勝ち抜きました':'敗退しました')+'。</p>'}
   updateStats({gf:res.gf,ga:res.ga},false);
   S.history.unshift({opp:CLUBS[r.opp-1].n+'(カップ)',gf:res.gf,ga:res.ga,season:S.season});S.history=S.history.slice(0,40);
   mission('play');if(win)mission('win');mission('goal',res.gf);
@@ -1832,6 +1838,162 @@ function docToTeam(t){
     players:t.players.map((p,i)=>({id:String(p.id||('o'+i)),name:String(p.name||'選手').slice(0,14),pos:i?(p.pos||'MF'):'GK',ht:clamp(+p.ht||178,160,205),age:clamp(+p.age||25,16,45),rar:p.rar||'N',sk:SK[p.sk]?p.sk:'',spd:cleanNum(p.spd,60),sht:cleanNum(p.sht,60),pas:cleanNum(p.pas,60),def:cleanNum(p.def,60),gk:cleanNum(p.gk,50)}))};
   return opp;
 }
+
+/* ===== PK戦 ===== */
+const PKC={gx0:300,gx1:660,gy0:180,gy1:300,sx:480,sy:470};
+let PK=null;
+const pkZoneC=(c,r)=>({x:[PKC.gx0+60,480,PKC.gx1-60][c],y:[PKC.gy0+32,PKC.gy1-32][r]});
+const pkZoneOf=(x,y)=>({c:x<PKC.gx0+120?0:x>PKC.gx1-120?2:1,r:y<(PKC.gy0+PKC.gy1)/2?0:1});
+function startPK(ut,ot,cb){
+  const ks=q=>q.players.slice(1).sort((a,b)=>b.sht-a.sht);
+  PK={ut,ot,cb,t:[ks(ut),ks(ot)],gk:[ut.players[0],ot.players[0]],sc:[0,0],mk:[[],[]],n:[0,0],turn:0,ph:'intro',pt:1.8,ax:480,ay:240,ch:0,hold:false,gz:null,msg:'',sub:'',fl:null,last:0,keys:{}};
+  $('#pk').hidden=false;sfx('whistle');sfx('crowd');
+  PK.raf=requestAnimationFrame(pkLoop);
+}
+function pkDone(){
+  const P=PK,[a,b]=P.sc,[na,nb]=P.n;
+  if(na>=5&&nb>=5)return na===nb&&a!==b;
+  return a>b+Math.max(0,5-nb)||b>a+Math.max(0,5-na);
+}
+function pkNext(){
+  const P=PK;if(pkDone()){P.ph='end';P.win=P.sc[0]>P.sc[1];P.msg=P.win?'VICTORY':'DEFEAT';P.sub='PK戦 '+P.sc[0]+' - '+P.sc[1]+'　タップで続ける';sfx(P.win?'goal':'impact');return}
+  P.msg='';P.sub='';
+  if(P.turn===0){P.ph='aim';P.ch=0;P.hold=false;P.ax=480;P.ay=240}
+  else{P.ph='guard';P.pt=2.4;P.gz=null}
+}
+function pkErr(sht,pw){const sd=(100-sht)/100*34+Math.abs(Math.min(pw,1)-.82)*70,r=()=>Math.random()+Math.random()-1;return {x:r()*sd,y:r()*sd*.6}}
+function pkSave(F,pw,kz,gkv){
+  const z=pkZoneOf(F.x,F.y);let p=0;
+  if(z.c===kz.c&&z.r===kz.r)p=.8;else if(z.c===kz.c)p=.3;else if(z.r===kz.r&&Math.abs(z.c-kz.c)===1)p=.22;
+  if(pw>.88)p-=.2;if(pw<.4)p+=.3;if(z.r===0&&z.c!==1)p-=.15;
+  return clamp(p+(gkv-60)/300,0,.92);
+}
+function pkShoot(){
+  const P=PK,t=P.turn,ks=P.t[t],kk=ks[P.n[t]%ks.length],gkv=P.gk[1-t].gk;let T,pw,kz;
+  if(t===0){T={x:P.ax,y:P.ay};pw=Math.min(1.15,P.ch);
+    const pr=.3+gkv/400;kz=Math.random()<pr?pkZoneOf(T.x,T.y):{c:ri(0,2),r:ri(0,1)}}
+  else{const c=Math.random()<.7?[0,2][ri(0,1)]:1,r=Math.random()<.55?1:0;T=pkZoneC(c,r);pw=rr(.62,.95);kz=P.gz||{c:1,r:1}}
+  const e=pkErr(kk.sht,pw),F={x:T.x+e.x,y:T.y+e.y-(pw>=1?110:0)};
+  const inG=F.x>PKC.gx0+6&&F.x<PKC.gx1-6&&F.y>PKC.gy0+6&&F.y<PKC.gy1;
+  let out='miss';if(inG)out=Math.random()<pkSave(F,pw,kz,gkv)?'save':'goal';
+  P.fl={F,pw,kz,out,k:kk};P.ph='flight';P.pt=.62;P.hold=false;sfx('tick',4);
+}
+function pkApply(){
+  const P=PK,t=P.turn,o=P.fl.out;
+  P.n[t]++;P.mk[t].push(o==='goal'?'g':'x');
+  if(o==='goal'){P.sc[t]++;P.msg='GOAL!';P.sub=P.fl.k.name;sfx('goal')}
+  else if(o==='save'){P.msg='SAVED!';P.sub='キーパーが止めた!';sfx('impact')}
+  else{P.msg='MISS!';P.sub=P.fl.F.y<PKC.gy0?'ふかしてしまった…':'枠を外れた…';sfx('tick',2)}
+  P.ph='result';P.pt=1.5;
+}
+function pkEnd(){
+  const P=PK;cancelAnimationFrame(P.raf);$('#pk').hidden=true;$('#pkb').hidden=true;
+  const w=P.win,cb=P.cb;PK=null;cb&&cb(w);
+}
+function pkLoop(ts){
+  const P=PK;if(!P)return;
+  const dt=Math.min(.05,(ts-(P.last||ts))/1000);P.last=ts;
+  /* コントローラー */
+  const g=(navigator.getGamepads?[...navigator.getGamepads()].find(x=>x&&x.connected):null);
+  let mx=(P.keys.r?1:0)-(P.keys.l?1:0),my=(P.keys.d?1:0)-(P.keys.u?1:0);
+  if(g){const ax=g.axes[0]||0,ay=g.axes[1]||0;if(Math.abs(ax)>.2)mx=ax;if(Math.abs(ay)>.2)my=ay;
+    const b=(g.buttons[0]&&g.buttons[0].pressed)||(g.buttons[1]&&g.buttons[1].pressed);
+    if(P.ph==='aim'){if(b)P.hold=true;else if(P.padb)P.hold=false}
+    if(P.ph==='end'&&b&&!P.padb)pkEnd();P.padb=b}
+  if(!PK)return;
+  if(P.ph==='aim'){
+    P.ax=clamp(P.ax+mx*300*dt,PKC.gx0-70,PKC.gx1+70);P.ay=clamp(P.ay+my*240*dt,PKC.gy0-60,PKC.gy1+20);
+    if(P.hold)P.ch=Math.min(1.15,P.ch+dt/1.25);
+    else if(P.ch>.04)pkShoot();
+  }else if(P.ph==='guard'){
+    if(g||P.keys.any){const c=mx<-.4?0:mx>.4?2:null,r=my<-.4?0:my>.4?1:null;if(c!==null||r!==null)P.gz={c:c!==null?c:(P.gz?P.gz.c:1),r:r!==null?r:(P.gz?P.gz.r:1)}}
+    P.pt-=dt;if(P.pt<=0)pkShoot();
+  }else if(P.ph==='flight'){P.pt-=dt;if(P.pt<=0)pkApply()}
+  else if(P.ph==='result'){P.pt-=dt;if(P.pt<=0){if(pkDone())pkNext();else{P.turn^=1;pkNext()}}}
+  else if(P.ph==='intro'){P.pt-=dt;if(P.pt<=0)pkNext()}
+  $('#pkb').hidden=P.ph!=='aim';
+  pkDraw();
+  P.raf=requestAnimationFrame(pkLoop);
+}
+function pkFig(c,x,y,h,col,lean){
+  c.save();c.translate(x,y);c.rotate(lean||0);
+  c.fillStyle=col;c.fillRect(-h*.17,-h*.62,h*.34,h*.36);
+  c.fillStyle='#10161c';c.fillRect(-h*.15,-h*.28,h*.12,h*.28);c.fillRect(h*.03,-h*.28,h*.12,h*.28);
+  c.fillStyle='#e9c7a0';c.beginPath();c.arc(0,-h*.72,h*.1,0,7);c.fill();
+  c.fillStyle=col;c.fillRect(-h*.3,-h*.6,h*.12,h*.3);c.fillRect(h*.18,-h*.6,h*.12,h*.3);
+  c.restore();
+}
+function pkDraw(){
+  const P=PK,c=$('#pkc').getContext('2d'),{gx0,gx1,gy0,gy1}=PKC;
+  /* 背景 */
+  let gr=c.createLinearGradient(0,0,0,220);gr.addColorStop(0,'#08111f');gr.addColorStop(1,'#1d3556');c.fillStyle=gr;c.fillRect(0,0,960,220);
+  for(let i=0;i<260;i++){c.fillStyle='rgba('+(120+(i*37)%120)+','+(100+(i*53)%100)+','+(140+(i*29)%100)+',.35)';c.fillRect((i*97)%960,110+(i*31)%80,3,3)}
+  c.fillStyle='#2a8c46';c.fillRect(0,200,960,340);
+  for(let i=0;i<10;i++){c.fillStyle=i%2?'rgba(255,255,255,.04)':'rgba(0,0,0,.05)';c.fillRect(0,200+i*34,960,34)}
+  c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=3;c.beginPath();c.moveTo(150,300);c.lineTo(810,300);c.moveTo(60,520);c.lineTo(190,300);c.moveTo(900,520);c.lineTo(770,300);c.stroke();
+  /* ゴール */
+  c.strokeStyle='rgba(255,255,255,.28)';c.lineWidth=1;
+  for(let x=gx0;x<=gx1;x+=18){c.beginPath();c.moveTo(x,gy0);c.lineTo(x,gy1);c.stroke()}
+  for(let y=gy0;y<=gy1;y+=15){c.beginPath();c.moveTo(gx0,y);c.lineTo(gx1,y);c.stroke()}
+  /* キーパー */
+  const gt=P.ph==='flight'||P.ph==='result',u=gt&&P.fl?clamp(1-P.pt/.45,0,1):0,kz=gt&&P.fl?pkZoneC(P.fl.kz.c,P.fl.kz.r):{x:480,y:gy1-32};
+  const kcol=P.turn===0?P.ot.color:P.ut.color,kx=480+(kz.x-480)*u,ky=gy1+(kz.y-gy1+40)*u*.8;
+  pkFig(c,kx,ky+10-(P.turn===0&&P.ph==='guard'?0:0),92,kcol,(kz.x-480)/260*u*1.1);
+  c.strokeStyle='#fff';c.lineWidth=7;c.beginPath();c.moveTo(gx0,gy1+2);c.lineTo(gx0,gy0);c.lineTo(gx1,gy0);c.lineTo(gx1,gy1+2);c.stroke();
+  /* 選択ゾーン(守備) */
+  if(P.ph==='guard'&&P.gz){const z=P.gz,w=(gx1-gx0)/3,h=(gy1-gy0)/2;c.fillStyle='rgba(106,167,255,.35)';c.fillRect(gx0+z.c*w,gy0+z.r*h,w,h)}
+  /* キッカー・ボール */
+  const kcol2=P.turn===0?P.ut.color:P.ot.color,fl=P.fl;
+  let bx=PKC.sx,by=PKC.sy,br=11;
+  if(P.ph==='flight'||P.ph==='result'){
+    const s=P.ph==='flight'?clamp(1-P.pt/.62,0,1):1,e=fl.out==='save'?pkZoneC(fl.kz.c,fl.kz.r):fl.F,f=fl.out==='save'?{x:e.x,y:e.y+10}:fl.F;
+    bx=PKC.sx+(f.x-PKC.sx)*s;by=PKC.sy+(f.y-PKC.sy)*s-Math.sin(Math.PI*s)*30;br=11-5*s;
+    if(P.ph==='result'&&fl.out!=='goal'&&fl.out!=='save'){br=6}
+  }
+  pkFig(c,PKC.sx-70+(P.ph==='flight'?clamp(1-P.pt/.3,0,1)*40:0),505,150,kcol2,P.ph==='flight'?.12:0);
+  c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(bx,by+br*.8,br*1.1,br*.4,0,0,7);c.fill();
+  c.fillStyle='#fff';c.beginPath();c.arc(bx,by,br,0,7);c.fill();c.strokeStyle='#222';c.lineWidth=1.5;c.stroke();
+  /* 照準・ゲージ */
+  if(P.ph==='aim'){
+    const col=P.ch>1?'#ff5a6a':P.ch>.7?'#ffb020':'#fff';
+    c.strokeStyle=col;c.lineWidth=3;c.beginPath();c.arc(P.ax,P.ay,16+P.ch*6,0,7);c.moveTo(P.ax-24,P.ay);c.lineTo(P.ax+24,P.ay);c.moveTo(P.ax,P.ay-24);c.lineTo(P.ax,P.ay+24);c.stroke();
+    c.fillStyle='rgba(0,0,0,.5)';c.fillRect(330,520-14,300,12);c.fillStyle='rgba(255,176,32,.5)';c.fillRect(330+300*.7/1.15,520-14,300*.2/1.15,12);
+    c.fillStyle=col;c.fillRect(330,520-14,300*Math.min(1,P.ch/1.15),12);
+  }
+  /* HUD */
+  c.textAlign='center';
+  [0,1].forEach(q=>{
+    const x=q?700:260,col=q?P.ot.color:P.ut.color,nm=q?P.ot.name:P.ut.name,cnt=Math.max(5,P.n[q]+(P.n[q]>=5?1:0));
+    c.fillStyle='rgba(5,13,22,.75)';c.fillRect(x-190,6,380,76);c.fillStyle=col;c.fillRect(x-190,6,380,5);
+    c.fillStyle='#fff';c.font='700 20px sans-serif';c.fillText(nm,x,38);
+    for(let i=0;i<cnt;i++){const cx=x-(cnt-1)*14+i*28,m=P.mk[q][i];c.beginPath();c.arc(cx,62,9,0,7);c.fillStyle=m==='g'?'#3ddc84':m==='x'?'#ff5a6a':'rgba(255,255,255,.15)';c.fill();c.strokeStyle='#fff';c.lineWidth=1.5;c.stroke()}
+  });
+  c.fillStyle='#fff';c.font='800 40px sans-serif';c.fillText(P.sc[0]+' - '+P.sc[1],480,56);
+  c.font='700 15px sans-serif';c.fillStyle='#ffd45a';
+  const kn=P.t[P.turn][P.n[P.turn]%P.t[P.turn].length].name;
+  if(P.ph==='aim')c.fillText('キッカー '+kn+'　ドラッグで狙って、SHOOT長押し→離す(オレンジ帯がベストの強さ)',480,110);
+  if(P.ph==='guard'){c.fillText('相手のキッカー '+kn+'　ゴールをタップして飛ぶ方向を選ぼう',480,110);c.fillStyle='#fff';c.font='800 30px sans-serif';c.fillText(Math.max(0,Math.ceil(P.pt)),480,150)}
+  if(P.ph==='intro'){c.fillStyle='rgba(0,0,0,.55)';c.fillRect(0,200,960,120);c.fillStyle='#fff';c.font='800 54px sans-serif';c.fillText('PENALTY SHOOTOUT',480,278)}
+  if(P.msg){c.fillStyle='rgba(0,0,0,.5)';c.fillRect(0,215,960,100);c.fillStyle=P.msg==='GOAL!'||P.msg==='VICTORY'?'#ffd45a':P.msg==='DEFEAT'?'#ff5a6a':'#fff';c.font='800 64px sans-serif';c.fillText(P.msg,480,282);c.font='700 20px sans-serif';c.fillStyle='#fff';c.fillText(P.sub||'',480,308)}
+}
+(function(){
+  const cv=$('#pkc'),pos=e=>{const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*960,y:(e.clientY-r.top)/r.height*540}};
+  const mv=e=>{if(!PK)return;const p=pos(e);
+    if(PK.ph==='aim'&&e.buttons!==0||(PK.ph==='aim'&&e.pointerType==='mouse')){PK.ax=clamp(p.x,PKC.gx0-70,PKC.gx1+70);PK.ay=clamp(p.y,PKC.gy0-60,PKC.gy1+20)}
+    if(PK.ph==='guard'&&(e.buttons!==0||e.type==='pointerdown')){if(p.x>PKC.gx0-40&&p.x<PKC.gx1+40&&p.y>PKC.gy0-40&&p.y<PKC.gy1+40)PK.gz=pkZoneOf(p.x,p.y)}};
+  cv.addEventListener('pointerdown',e=>{if(PK&&PK.ph==='end'){pkEnd();return}mv(e)});
+  cv.addEventListener('pointermove',mv);
+  const b=$('#pkb');
+  b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(PK&&PK.ph==='aim')PK.hold=true});
+  const up=()=>{if(PK)PK.hold=false};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
+  const KM2={ArrowLeft:'l',a:'l',ArrowRight:'r',d:'r',ArrowUp:'u',w:'u',ArrowDown:'d',s:'d'};
+  addEventListener('keydown',e=>{if(!PK)return;const k=e.key.length===1?e.key.toLowerCase():e.key;
+    if(KM2[k]){PK.keys[KM2[k]]=true;PK.keys.any=true;e.preventDefault();e.stopImmediatePropagation()}
+    else if(k===' '||k==='Enter'){e.preventDefault();e.stopImmediatePropagation();if(PK.ph==='aim')PK.hold=true;else if(PK.ph==='end')pkEnd()}},true);
+  addEventListener('keyup',e=>{if(!PK)return;const k=e.key.length===1?e.key.toLowerCase():e.key;
+    if(KM2[k]){PK.keys[KM2[k]]=false;e.stopImmediatePropagation()}
+    else if(k===' '){PK.hold=false;e.stopImmediatePropagation()}},true);
+})();
 function playOnline(id,tt){
   const t=tt||ON.teams.find(x=>x.id===id);
   if(!t||!Array.isArray(t.players)||t.players.length!==11){toast('このチームは対戦できません');return}
@@ -1894,6 +2056,7 @@ document.addEventListener('click',e=>{
   else if(a==='publish')publishTeam(false).then(()=>render());
   else if(a==='challenge')playOnline(el.dataset.id);
   else if(a==='quick')quick();
+  else if(a==='pk'){const ut=ownTeam(),ot=docToTeam(ghostTeam(myTeamDoc().ovr));startPK(ut,ot,w=>{const coins=w?150:40;S.coins+=coins;mission('play');if(w)mission('win');save();toast((w?'PK戦に勝利! +':'PK戦に敗北 +')+coins+' C');render()})}
   else if(a==='pvpq')pvpQuick();
   else if(a==='pvph')pvpHost();
   else if(a==='pvpj')pvpJoin();
@@ -2162,5 +2325,6 @@ S=load();if(S&&S.opt&&!S.opt.zoom)S.opt.zoom=1;applyEdit();
 render();
 onlineInit();
 </script>
+
 </body>
 </html>
